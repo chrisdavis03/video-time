@@ -14,7 +14,7 @@ def SMPTE_2997_NDF_to_frames(tc):
 
 	return int(frameNumber)
 
-def  SMPTE_2398_to_frames(tc):
+def SMPTE_2398_to_frames(tc):
 	hh, mm, ss, ff = re.split(':', tc)
 	frameNumber = 86400 * int(hh) + 1800 * int(mm) + 30 * int(ss) + int(ff)
 
@@ -45,7 +45,39 @@ def frames_to_SMPTE_2997_DF(frameNumber):
 
 	return '{}:{}:{};{}'.format('{:02d}'.format(int(hh)), '{:02d}'.format(int(mm)), '{:02d}'.format(int(ss)), '{:02d}'.format(int(ff)))
 
+def SMPTE_2997DF_clip(tcIn, tcOut):
+	startFrames = SMPTE_2997_DF_to_frames(tcIn)
+	endFrames = SMPTE_2997_DF_to_frames(tcOut)
 
+	clipDuration = endFrames - startFrames
+	startFileRelativeSeconds = frames_to_file_relative_seconds('29.97', startFrames)
+	endFileRelativeSeconds = frames_to_file_relative_seconds('29.97', endFrames)
+
+	return {"clip_duration": clipDuration, "in_file_relative_seconds": startFileRelativeSeconds, "out_file_relative_seconds": endFileRelativeSeconds}
+
+def SMPTE_2997NDF_clip(tcIn, tcOut):
+	startFrames = SMPTE_2997_NDF_to_frames(tcIn)
+	endFrames = SMPTE_2997_NDF_to_frames(tcOut)
+
+	clipDuration = endFrames - startFrames
+	startFileRelativeSeconds = frames_to_file_relative_seconds('29.97', startFrames)
+	endFileRelativeSeconds = frames_to_file_relative_seconds('29.97', endFrames)
+
+	return {"clip_duration": clipDuration, "in_file_relative_seconds": startFileRelativeSeconds, "out_file_relative_seconds": endFileRelativeSeconds}
+
+def SMPTE_2398_clip(tcIn, tcOut):
+	startFrames = SMPTE_2398_to_frames(tcIn)
+	endFrames = SMPTE_2398_to_frames(tcOut)
+
+	clipDuration = endFrames - startFrames
+	startFileRelativeSeconds = frames_to_file_relative_seconds('23.98', startFrames)
+	endFileRelativeSeconds = frames_to_file_relative_seconds('23.98', endFrames)
+
+	return {"clip_duration": clipDuration, "in_file_relative_seconds": startFileRelativeSeconds, "out_file_relative_seconds": endFileRelativeSeconds}
 
 if __name__ == '__main__':
-	pass
+	startTimecode = '00:59:59:00'
+	endTimecode = '01:59:59:00'
+
+	clip = SMPTE_2398_clip(startTimecode, endTimecode)
+	print (clip)

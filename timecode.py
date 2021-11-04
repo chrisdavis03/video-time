@@ -16,7 +16,13 @@ def SMPTE_2997_NDF_to_frames(tc):
 
 def SMPTE_2398_to_frames(tc):
 	hh, mm, ss, ff = re.split(':', tc)
-	frameNumber = 86400 * int(hh) + 1800 * int(mm) + 30 * int(ss) + int(ff)
+	frameNumber = 86400 * int(hh) + 1440 * int(mm) + 24 * int(ss) + int(ff)
+
+	return int(frameNumber)
+
+def SMPTE_25_to_frames(tc):
+	hh, mm, ss, ff = re.split(':', tc)
+	frameNumber = 90000 * int(hh) + 1500 * int(mm) + 25 * int(ss) + int(ff)
 
 	return int(frameNumber)
 
@@ -29,6 +35,10 @@ def frames_to_file_relative_seconds(framerate, frames):
 	if framerate == '23.98':
 		#id prefer to round to the nearest frame boundary but for now we are calling it 2 decimal places.
 		file_relative_seconds = round((1/(24000/1001)) * frames, 2)
+		return file_relative_seconds
+	if framerate == '25':
+		#id prefer to round to the nearest frame boundary but for now we are calling it 2 decimal places.
+		file_relative_seconds = round((1/(25000/1001)) * frames, 2)
 		return file_relative_seconds
 	pass
 
@@ -75,9 +85,20 @@ def SMPTE_2398_clip(tcIn, tcOut):
 
 	return {"clip_duration": clipDuration, "in_file_relative_seconds": startFileRelativeSeconds, "out_file_relative_seconds": endFileRelativeSeconds}
 
+def SMPTE_25_clip(tcIn, tcOut):
+	startFrames = SMPTE_25_to_frames(tcIn)
+	endFrames = SMPTE_25_to_frames(tcOut)
+
+	clipDuration = endFrames - startFrames
+	startFileRelativeSeconds = frames_to_file_relative_seconds('25', startFrames)
+	endFileRelativeSeconds = frames_to_file_relative_seconds('25', endFrames)
+
+	return {"clip_duration": clipDuration, "in_file_relative_seconds": startFileRelativeSeconds, "out_file_relative_seconds": endFileRelativeSeconds}
+
 if __name__ == '__main__':
 	startTimecode = '00:59:59:00'
 	endTimecode = '01:59:59:00'
 
-	clip = SMPTE_2398_clip(startTimecode, endTimecode)
+	clip = SMPTE_25_clip(startTimecode, endTimecode)
 	print (clip)
+

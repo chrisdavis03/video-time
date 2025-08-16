@@ -4,3 +4,9 @@
 .pytest_cache/
 __pycache__/
 .vscode/
+
+#keeping for reference
+/__bak
+
+#poetry build
+/dist

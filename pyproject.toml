@@ -1,0 +1,29 @@
+[project]
+name = "video-time"
+version = "0.1.0"
+description = "Represent and manipulate time for the Media and Entertainment industry."
+authors = [
+    {name = "chrisdavis03",email = "chrisdavis03@gmail.com"}
+]
+license = {text = "{ text = \"MIT License\" }"}
+readme = "README.md"
+requires-python = "<4.0,>=3.11"
+dependencies = [
+    "pydantic (>=2.11.7,<3.0.0)",
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry]
+packages = [{include = "videotime", from="src"}]
+[tool.poetry.group.test.dependencies]
+pytest = "^8.4.1"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.4.1"
+

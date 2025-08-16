@@ -1,7 +1,8 @@
 import re
+from typing import Union
 
 
-def SMPTE_2997_DF_to_frames(tc):
+def SMPTE_2997_DF_to_frames(tc: Union[float, str]) -> int:
     """At 29.97 fps, every minute (except minutes divisible by ten), you skip counting the first two frames."""
     hh, mm, ss, ff = re.split(":|;", tc)
     totalMinutes = 60 * int(hh) + int(mm)
@@ -16,28 +17,28 @@ def SMPTE_2997_DF_to_frames(tc):
     return int(frameNumber)
 
 
-def SMPTE_2997_NDF_to_frames(tc):
+def SMPTE_2997_NDF_to_frames(tc: Union[float, str]) -> int:
     hh, mm, ss, ff = re.split(":", tc)
     frameNumber = 108000 * int(hh) + 1800 * int(mm) + 30 * int(ss) + int(ff)
 
     return int(frameNumber)
 
 
-def SMPTE_2398_to_frames(tc):
+def SMPTE_2398_to_frames(tc: Union[float, str]) -> int:
     hh, mm, ss, ff = re.split(":", tc)
     frameNumber = 86400 * int(hh) + 1440 * int(mm) + 24 * int(ss) + int(ff)
 
     return int(frameNumber)
 
 
-def SMPTE_25_to_frames(tc):
+def SMPTE_25_to_frames(tc: str) -> int:
     hh, mm, ss, ff = re.split(":", tc)
     frameNumber = 90000 * int(hh) + 1500 * int(mm) + 25 * int(ss) + int(ff)
 
     return int(frameNumber)
 
 
-def frames_to_file_relative_seconds(framerate, frames):
+def frames_to_file_relative_seconds(framerate: float, frames: int) -> float:
     # At this point drop frame doesn't matter. Frames counts @ 29.97 are all the same duration.
     if framerate == "29.97":
         # id prefer to round to the nearest frame boundary but for now we are calling it 2 decimal places.
@@ -54,7 +55,7 @@ def frames_to_file_relative_seconds(framerate, frames):
     pass
 
 
-def file_relative_seconds_to_media_time(fileRelativeSeconds, framerate):
+def file_relative_seconds_to_media_time(fileRelativeSeconds: float) -> str:
     hh = int(fileRelativeSeconds / 3600)
     mm = int((fileRelativeSeconds - (hh * 3600)) / 60)
     ss = int(fileRelativeSeconds - (hh * 3600) - (mm * 60))
@@ -62,7 +63,7 @@ def file_relative_seconds_to_media_time(fileRelativeSeconds, framerate):
     return f"{hh:02}:{mm:02}:{ss:02}.{ms:03}"
 
 
-def mediatime_to_file_relative_seconds(mediatime):
+def mediatime_to_file_relative_seconds(mediatime: str) -> float:
     hh, mm, ss = mediatime.split(":")
     hh_sec = int(hh) * 3600
     mm_sec = int(mm) * 60
@@ -71,7 +72,7 @@ def mediatime_to_file_relative_seconds(mediatime):
     return hh_sec + mm_sec + ss_sec
 
 
-def frames_to_SMPTE_2997_DF(frameNumber):
+def frames_to_SMPTE_2997_DF(frameNumber: int) -> str:
     frameNumber += 1
     D = frameNumber / 17982
     M = frameNumber % 17982
@@ -90,13 +91,13 @@ def frames_to_SMPTE_2997_DF(frameNumber):
     )
 
 
-def SMPTE_2997DF_clip(tcIn, tcOut):
+def SMPTE_2997DF_clip(tcIn: Union[float, str], tcOut: Union[float, str]) -> dict:
     startFrames = SMPTE_2997_DF_to_frames(tcIn)
     endFrames = SMPTE_2997_DF_to_frames(tcOut)
 
     clipDuration = endFrames - startFrames
-    startFileRelativeSeconds = frames_to_file_relative_seconds("29.97", startFrames)
-    endFileRelativeSeconds = frames_to_file_relative_seconds("29.97", endFrames)
+    startFileRelativeSeconds = frames_to_file_relative_seconds(29.97, startFrames)
+    endFileRelativeSeconds = frames_to_file_relative_seconds(29.97, endFrames)
 
     return {
         "clip_duration": clipDuration,
@@ -105,13 +106,13 @@ def SMPTE_2997DF_clip(tcIn, tcOut):
     }
 
 
-def SMPTE_2997NDF_clip(tcIn, tcOut):
+def SMPTE_2997NDF_clip(tcIn: str, tcOut: str) -> dict:
     startFrames = SMPTE_2997_NDF_to_frames(tcIn)
     endFrames = SMPTE_2997_NDF_to_frames(tcOut)
 
     clipDuration = endFrames - startFrames
-    startFileRelativeSeconds = frames_to_file_relative_seconds("29.97", startFrames)
-    endFileRelativeSeconds = frames_to_file_relative_seconds("29.97", endFrames)
+    startFileRelativeSeconds = frames_to_file_relative_seconds(29.97, startFrames)
+    endFileRelativeSeconds = frames_to_file_relative_seconds(29.97, endFrames)
 
     return {
         "clip_duration": clipDuration,
@@ -120,13 +121,13 @@ def SMPTE_2997NDF_clip(tcIn, tcOut):
     }
 
 
-def SMPTE_2398_clip(tcIn, tcOut):
+def SMPTE_2398_clip(tcIn: str, tcOut: str) -> dict:
     startFrames = SMPTE_2398_to_frames(tcIn)
     endFrames = SMPTE_2398_to_frames(tcOut)
 
     clipDuration = endFrames - startFrames
-    startFileRelativeSeconds = frames_to_file_relative_seconds("23.98", startFrames)
-    endFileRelativeSeconds = frames_to_file_relative_seconds("23.98", endFrames)
+    startFileRelativeSeconds = frames_to_file_relative_seconds(23.98, startFrames)
+    endFileRelativeSeconds = frames_to_file_relative_seconds(23.98, endFrames)
 
     return {
         "clip_duration": clipDuration,
@@ -135,13 +136,13 @@ def SMPTE_2398_clip(tcIn, tcOut):
     }
 
 
-def SMPTE_25_clip(tcIn, tcOut):
+def SMPTE_25_clip(tcIn: str, tcOut: str) -> dict:
     startFrames = SMPTE_25_to_frames(tcIn)
     endFrames = SMPTE_25_to_frames(tcOut)
 
     clipDuration = endFrames - startFrames
-    startFileRelativeSeconds = frames_to_file_relative_seconds("25", startFrames)
-    endFileRelativeSeconds = frames_to_file_relative_seconds("25", endFrames)
+    startFileRelativeSeconds = frames_to_file_relative_seconds(25, startFrames)
+    endFileRelativeSeconds = frames_to_file_relative_seconds(25, endFrames)
 
     return {
         "clip_duration": clipDuration,
